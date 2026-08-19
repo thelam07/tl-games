@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+/* Mau thuong hieu TL-Tech, ke thua tu BTL truoc */
+@theme {
+  --color-brand: #2af598;
+  --color-brand-dark: #00c97a;
+  --color-ink: #111111;
+}
+
+body {
+  @apply bg-neutral-50 text-neutral-900 antialiased;
+  font-family: Inter, system-ui, sans-serif;
+}
