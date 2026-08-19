@@ -13,6 +13,7 @@ import Checkout from './pages/Checkout';
 import MyOrders from './pages/MyOrders';
 import AdminDashboard from './pages/admin/Dashboard';
 import NotFound from './pages/NotFound';
+import Nhap from './pages/Nhap';
 
 export default function App() {
   const restore = useAuth((s) => s.restore);
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="gio-hang" element={<Cart />} />
           <Route path="dang-nhap" element={<Login />} />
           <Route path="dang-ky" element={<Register />} />
+          <Route path="nhap" element={<Nhap />} />   {/* trang tap React, xoa duoc */}
 
           {/* Phai dang nhap */}
           <Route element={<RequireAuth />}>
