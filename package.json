@@ -1,8 +1,8 @@
 {
-  "name": "btl-ltw",
+  "name": "tl-games",
   "version": "1.0.0",
   "private": true,
-  "description": "TL-Tech Store - BTL Lap trinh Web",
+  "description": "TL-Games - BTL Lap trinh Web",
   "scripts": {
     "dev": "concurrently -n server,client -c green,cyan \"npm:dev:server\" \"npm:dev:client\"",
     "dev:server": "npm --prefix server run dev",

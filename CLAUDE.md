@@ -105,37 +105,58 @@ Khen cụ thể, đừng khen chung chung. "Cách bạn tách `formatVND` ra fil
 
 ## Thông tin project
 
-**TL-Tech Store** — website bán laptop & phụ kiện.
+**TL-Games** — website bán hàng số về game: key game, account, item, gift card.
+Một cửa hàng, KHÔNG phải sàn nhiều người bán (đã cân nhắc và loại Shopee-style vì quá lớn).
 
 - **Stack**: React 19 + TypeScript + Vite + Tailwind v4 (client) · Express 5 + TypeScript (server) · Supabase/PostgreSQL
 - **Cấu trúc & cách chạy**: xem `README.md`
 - **Type dùng chung**: `shared/types.ts` — client và server import cùng file này
-- **Database**: `db/schema.sql` (có hàm `create_order` chạy transaction trừ kho) và `db/seed.sql`
+- **Database**: `db/schema.sql` + `db/seed.sql`, chạy bằng Supabase SQL Editor
 
-### Đã có sẵn (dùng làm mẫu để sinh viên học theo)
+### Trạng thái: sinh viên viết TỪ ĐẦU
 
-- Server: toàn bộ API auth / products / categories / orders, middleware `requireAuth` + `requireAdmin`, validate bằng zod, error handler tập trung
-- Client: `api/client.ts` (fetch wrapper), `store/auth.ts` + `store/cart.ts` (zustand), `Layout`, `Header`, `ProductCard`, `RequireAuth`
-- Trang mẫu hoàn chỉnh: `Home.tsx` (search + filter + sort + pagination), `ProductDetail.tsx`, `Cart.tsx`, `Login.tsx`
+Sinh viên **tự chọn đề tài** và **tự triển khai toàn bộ**. Repo hiện chỉ có khung rỗng:
+config (Vite, tsconfig, Tailwind, proxy), cây thư mục, và 2 file chạy tạm
+(`client/src/App.tsx`, `server/src/index.ts`) để `npm run dev` lên được.
 
-### Sinh viên phải tự làm
+**Không còn code mẫu nào trong repo.** Mọi component, page, route, middleware,
+store, schema đều do sinh viên viết.
 
-| Việc | File | Giai đoạn |
-|---|---|---|
-| Form đăng ký | `client/src/pages/Register.tsx` | 2 |
-| Đặt hàng | `client/src/pages/Checkout.tsx` | 3 |
-| Lịch sử đơn hàng | `client/src/pages/MyOrders.tsx` | 3 |
-| CRUD sản phẩm + quản lý đơn + thống kê | `client/src/pages/admin/Dashboard.tsx` | 4 |
-| Đánh giá sản phẩm (bảng `reviews` đã có) | route mới + UI | 4 |
-| Upload ảnh lên Supabase Storage | route mới + UI | 4 |
-| Deploy | Vercel + Render | 4 |
+`client/src/pages/Nhap.tsx` (route `/nhap`) là sân tập React — không thuộc project,
+sinh viên phá thoải mái.
 
-Khi bí, **hướng sinh viên sang đọc code mẫu tương ứng** thay vì viết hộ:
-Register → đọc `Login.tsx` · Checkout → đọc `Cart.tsx` + `createOrderSchema` · Admin table → đọc `Home.tsx`.
+### Bản tham khảo: branch `scaffold-goc`
+
+Branch `scaffold-goc` giữ nguyên scaffold cũ (TL-Tech Store bán laptop, ~1450 dòng:
+API auth/products/orders, store zustand, trang Home/Cart/Login/ProductDetail).
+
+Khi sinh viên bí, **hướng sang đọc file tương ứng ở đó** thay vì viết hộ:
+
+```bash
+git show scaffold-goc:server/src/routes/orders.ts
+```
+
+Domain khác nhau (laptop vs key game) nên không dán thẳng được — phải hiểu ý tưởng
+rồi tự viết lại. Nhắc sinh viên điều đó, đừng để biến thành copy.
+
+### Sinh viên phải tự làm — tức là tất cả
+
+| Việc | Giai đoạn |
+|---|---|
+| Thiết kế `db/schema.sql` + `seed.sql` | 0 |
+| Server: auth (bcrypt + JWT), CRUD sản phẩm, đơn hàng, middleware, validate | 2-3 |
+| Client: Layout, Header, routing, các page, store zustand, fetch wrapper | 1-4 |
+| Hàm transaction bán key (chống race condition) | 3 |
+| Admin: CRUD + quản lý đơn + thống kê | 4 |
+| Đánh giá sản phẩm, upload ảnh lên Supabase Storage | 4 |
+| Deploy Vercel + Render + keep-alive Supabase | 4 |
 
 ---
 
 ## Kiến thức cần bám theo từng giai đoạn
+
+**Giai đoạn 0 — SQL & thiết kế CSDL** *(sinh viên chưa từng gõ SQL — kỳ trước tạo bảng bằng bấm chuột trên Supabase Dashboard)*
+`create table` + kiểu dữ liệu Postgres, `primary key`, `references` (khóa ngoại), `not null`, `default`, `unique`, `check`, `insert`. Quan hệ 1-nhiều và nhiều-nhiều (liên hệ được với môn Toán rời rạc 1 đang học song song). **Sinh viên thiết kế bảng/quan hệ/ràng buộc — mentor lo cú pháp.**
 
 **Giai đoạn 1 — Nền TypeScript & React**
 `interface` vs `type`, union type (`OrderStatus`), generic (`Paginated<T>`, `api<T>()`), `useState` / `useEffect` / cleanup function, props & key trong list, React Router (`Route`, `Outlet`, `useParams`, `useNavigate`)
@@ -155,8 +176,11 @@ CRUD, phân quyền, optimistic update, biến môi trường khi deploy, CORS, 
 
 Thầy có thể hỏi những câu này — hỏi trước cho sinh viên quen:
 
-- Vì sao `order_items` phải lưu `price_at_purchase` mà không join lấy giá từ `products`?
-- Hai người cùng mua sản phẩm cuối cùng một lúc thì chuyện gì xảy ra? Code chống thế nào?
+- Vì sao chi tiết đơn hàng phải lưu giá lúc mua, mà không join lấy giá hiện tại?
+- Hai người cùng bấm mua **key cuối cùng** của một game thì chuyện gì xảy ra? Code chống thế nào?
+- Sau khi thanh toán mới được xem key — server kiểm tra thế nào để người khác không xem được key của mình?
+- Key, account, item có cấu trúc dữ liệu khác nhau — vì sao em gộp chung / tách riêng bảng?
+- "Tồn kho" ở đây là đếm số key còn trống chứ không phải một con số — lợi và hại gì so với lưu `stock` dạng số?
 - Client đã chặn route admin rồi, sao server còn cần `requireAdmin`?
 - Nếu client gửi `total: 0` lên khi đặt hàng thì sao?
 - `service_role` key lộ ra client thì hậu quả gì?

@@ -1,6 +1,11 @@
-# TL-Tech Store — BTL Lập trình Web
+# TL-Games — BTL Lập trình Web
 
-Website bán laptop & phụ kiện. **React + TypeScript + Vite** (client) · **Express + TypeScript** (server) · **Supabase/PostgreSQL** (database).
+Website bán hàng số về game: **key game, account, item, gift card**.
+Một cửa hàng (không phải sàn nhiều người bán).
+
+**React + TypeScript + Vite + Tailwind** (client) · **Express + TypeScript** (server) · **Supabase/PostgreSQL** (database).
+
+> Project viết từ đầu. Repo hiện chỉ có khung rỗng + config — mọi code nghiệp vụ sẽ do sinh viên viết.
 
 ## Cấu trúc
 
@@ -8,51 +13,51 @@ Website bán laptop & phụ kiện. **React + TypeScript + Vite** (client) · **
 btl-ltw/
 ├── client/          React + TS + Vite + Tailwind v4
 │   └── src/
-│       ├── api/         gọi API (fetch wrapper, tự gắn token)
-│       ├── components/  Header, Layout, ProductCard, RequireAuth
-│       ├── lib/         format tiền / ngày
-│       ├── pages/       mỗi route 1 file
-│       └── store/       zustand: auth, cart (cart tự lưu localStorage)
+│       ├── api/         gọi API (fetch wrapper)          — trống
+│       ├── components/  UI dùng lại nhiều nơi            — trống
+│       ├── lib/         hàm tiện ích (format tiền/ngày)  — trống
+│       ├── pages/       mỗi route 1 file                 — trống
+│       │   └── Nhap.tsx     sân tập React, không thuộc project
+│       ├── store/       zustand: auth, cart              — trống
+│       ├── App.tsx      bảng định tuyến                  — tạm
+│       └── index.css    Tailwind + màu thương hiệu
 ├── server/          Express + TS
-│   ├── scripts/hash.ts  tạo bcrypt hash cho tài khoản admin
 │   └── src/
-│       ├── lib/         env (validate bằng zod), supabase, jwt
-│       ├── middleware/  requireAuth, requireAdmin, errorHandler
-│       └── routes/      auth, products, categories, orders
-├── shared/types.ts  type dùng chung cả 2 bên — sửa 1 lần, 2 bên đổi theo
+│       ├── lib/         env, supabase, jwt               — trống
+│       ├── middleware/  requireAuth, errorHandler        — trống
+│       ├── routes/      auth, products, orders...        — trống
+│       ├── types/       khai báo type cho Express        — trống
+│       └── index.ts     điểm khởi động                   — tạm
+├── shared/types.ts  type dùng chung cả 2 bên             — trống
 └── db/
-    ├── schema.sql   tạo bảng + hàm create_order (transaction trừ kho)
-    └── seed.sql     18 sản phẩm mẫu + 2 tài khoản
+    ├── schema.sql   tạo bảng                             — trống
+    └── seed.sql     dữ liệu mẫu                          — trống
 ```
 
-## Chạy lần đầu
-
-**1. Tạo database**
-
-Vào [supabase.com](https://supabase.com) → New project → SQL Editor → chạy lần lượt `db/schema.sql` rồi `db/seed.sql`.
-
-**2. Điền biến môi trường**
-
-`server/.env` (copy từ `.env.example`) — lấy từ Supabase → Project Settings → Data API:
-
-```
-SUPABASE_URL=https://xxxx.supabase.co
-SUPABASE_SERVICE_KEY=<service_role key>
-JWT_SECRET=<đã sinh sẵn, giữ nguyên>
-```
-
-> `service_role` key bỏ qua toàn bộ RLS — **chỉ để ở server**, không bao giờ đưa xuống trình duyệt.
-
-**3. Chạy**
+## Chạy
 
 ```bash
 npm run install:all   # chỉ cần lần đầu
 npm run dev           # chạy song song server (3000) + client (5173)
 ```
 
-Mở http://localhost:5173
+Mở http://localhost:5173 — hiện ra chữ `TL-Games` là môi trường ổn.
+Sân tập React ở http://localhost:5173/nhap
 
-Tài khoản mẫu: `admin@tltech.vn / admin123` · `user@tltech.vn / user123`
+Lúc dev không cần điền `client/.env`: Vite tự chuyển tiếp `/api/...` sang `localhost:3000`
+(xem `client/vite.config.ts`), nên không dính lỗi CORS.
+
+## Database
+
+Chưa có. Các bước khi bắt đầu Giai đoạn 0:
+
+1. [supabase.com](https://supabase.com) → New project
+2. Thiết kế bảng, viết vào `db/schema.sql`
+3. Copy nội dung file → Supabase Dashboard → **SQL Editor** → Run
+4. Điền `server/.env` (copy từ `server/.env.example`), lấy giá trị ở Project Settings → Data API
+
+> `service_role` key bỏ qua toàn bộ phân quyền — **chỉ để ở server**, không bao giờ đưa xuống trình duyệt.
+> Mọi biến có tiền tố `VITE_` đều bị nhét vào file JS gửi xuống trình duyệt, ai cũng đọc được.
 
 ## Lệnh hay dùng
 
@@ -62,37 +67,30 @@ Tài khoản mẫu: `admin@tltech.vn / admin123` · `user@tltech.vn / user123`
 | `npm --prefix server run dev` | chỉ server |
 | `npm --prefix client run dev` | chỉ client |
 | `npm run build` | typecheck server + build client |
-| `npm --prefix server run hash <mật-khẩu>` | sinh bcrypt hash |
 
-## API
+## Lộ trình
 
-| Method | Endpoint | Quyền |
-|---|---|---|
-| POST | `/api/auth/register` · `/api/auth/login` | ai cũng gọi được |
-| GET | `/api/auth/me` | đã đăng nhập |
-| GET | `/api/products?q=&category=&min=&max=&sort=&page=` | công khai |
-| GET | `/api/products/:slug` | công khai |
-| POST/PUT/DELETE | `/api/products` · `/api/products/:id` | admin |
-| GET | `/api/categories` | công khai |
-| POST | `/api/orders` | đã đăng nhập |
-| GET | `/api/orders/me` · `/api/orders/:id` | đã đăng nhập |
-| GET | `/api/orders?status=` | admin |
-| PATCH | `/api/orders/:id/status` | admin |
-
-## Còn phải làm
-
-Các trang đang là stub, mở file ra sẽ thấy gợi ý từng bước:
-
-- [ ] `pages/Register.tsx` — form đăng ký
-- [ ] `pages/Checkout.tsx` — đặt hàng
-- [ ] `pages/MyOrders.tsx` — lịch sử đơn
-- [ ] `pages/admin/Dashboard.tsx` — CRUD sản phẩm, quản lý đơn, thống kê
-- [ ] Đánh giá sản phẩm (bảng `reviews` đã có sẵn trong schema)
-- [ ] Upload ảnh lên Supabase Storage
-- [ ] Deploy: client → Vercel, server → Render
+| GĐ | Việc |
+|---|---|
+| 0 | Thiết kế CSDL, viết `schema.sql` + `seed.sql` |
+| 1 | React: JSX, props, `useState`, `.map()`, React Router |
+| 2 | Auth: bcrypt + JWT, `requireAuth`, form đăng ký / đăng nhập |
+| 3 | Danh sách + tìm kiếm + phân trang, giỏ hàng, đặt hàng (transaction bán key) |
+| 4 | Admin CRUD + thống kê, đánh giá, upload ảnh, deploy |
 
 ## Deploy
 
 - **Client (Vercel)**: root `client`, build `npm run build`, output `dist`, thêm env `VITE_API_URL=https://<server>.onrender.com`
-- **Server (Render)**: root `server`, build `npm install`, start `npm start`, thêm 4 biến trong `.env` + `CLIENT_ORIGIN=https://<app>.vercel.app`
-- Render bản free ngủ sau 15 phút không dùng → request đầu tiên chờ ~50s. Trước khi demo nhớ gọi trước cho server thức dậy.
+- **Server (Render)**: root `server`, build `npm install`, start `npm start`, thêm các biến trong `.env` + `CLIENT_ORIGIN=https://<app>.vercel.app`
+- Render free ngủ sau 15 phút → request đầu chờ ~50s. Trước khi demo nhớ gọi trước cho server thức dậy.
+- Supabase free **tạm dừng project sau ~7 ngày không có request tới database**. Cần một job gọi định kỳ vào endpoint có truy vấn DB thật (endpoint chỉ trả `{ok:true}` mà không chạm DB thì vô tác dụng).
+
+## Tham khảo
+
+Branch `scaffold-goc` giữ scaffold cũ (TL-Tech Store bán laptop) để đối chiếu khi bí:
+
+```bash
+git show scaffold-goc:server/src/routes/orders.ts
+```
+
+Domain khác nhau nên không dán thẳng được — đọc để hiểu ý tưởng, rồi tự viết lại.
