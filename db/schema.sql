@@ -63,7 +63,7 @@ create table san_pham (
 create table kho (
   id bigint generated always as identity primary key,
   san_pham_id bigint not null references san_pham(id),
-  noi_dung text not null,
+  noi_dung text not null unique,
   trang_thai text not null default 'con' check( trang_thai in ('con', 'da_ban')),
   ngay_tao timestamptz not null default now()
 );
