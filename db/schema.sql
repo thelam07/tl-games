@@ -96,3 +96,10 @@ create table chi_tiet_don (
   kho_id bigint not null references kho(id) unique,
   gia_luc_mua numeric(12,0) check(gia_luc_mua >= 0) not null
 );
+
+-- Cap quyen cho service_role (server dung khoa sb_secret_ chay duoi role nay).
+-- KHONG cap cho anon/authenticated: client khong bao gio goi thang Supabase,
+-- moi thu deu di qua server Express.
+grant usage on schema public to service_role;
+grant select, insert, update, delete on all tables in schema public to service_role;
+grant usage, select on all sequences in schema public to service_role;
