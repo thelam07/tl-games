@@ -1,5 +1,4 @@
 // Type dung chung giua client va server.
-// TODO: dinh nghia sau khi thiet ke xong bang trong db/schema.sql
 export type SanPham = {
   id: number;
   ten: string;
